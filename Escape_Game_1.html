@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Helft Rudolph – Detektiv-Rätsel</title>
+<style>
+    body { font-family: Arial, sans-serif; padding: 30px; background-color: #f0f8ff; }
+    h2 { color: #d63447; }
+    input { padding: 8px; font-size: 16px; }
+    button { padding: 8px 12px; font-size: 16px; margin-left: 5px; }
+    #result { margin-top: 20px; font-weight: bold; font-size: 18px; }
+</style>
+</head>
+<body>
+
+<h2>Helft Rudolph – Detektiv-Rätsel</h2>
+<p>Dieser Detektiv stürzt sich mutig in jedes Abenteuer, ist schnell zur Stelle, wenn Hilfe gebraucht wird, und hat immer einen kühlen Kopf, selbst in stürmischen Situationen. Wer ist es?</p>
+
+<input type="text" id="answer" placeholder="Name eingeben">
+<button onclick="checkAnswer()">Senden</button>
+
+<p id="result"></p>
+
+<script>
+function checkAnswer() {
+    // Eingabe auslesen, Leerzeichen entfernen, Kleinbuchstaben für Vergleich
+    var ans = document.getElementById("answer").value.trim().toLowerCase();
+
+    // Richtiger Name
+    var correctName = "jack blizzard";
+
+    if(ans === correctName){
+        document.getElementById("result").innerHTML = "Richtig! Hier ist der nächste Hinweis: Code für Geschenk 482";
+    } else {
+        document.getElementById("result").innerHTML = "Falsch, überprüfe die Hinweise auf deinem Boarding Pass.";
+    }
+}
+</script>
+
+</body>
+</html>
