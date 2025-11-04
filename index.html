@@ -2,13 +2,88 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Helft Rudolph – Detektiv-Rätsel</title>
 <style>
-    body { font-family: Arial, sans-serif; padding: 30px; background-color: #f0f8ff; }
-    h2 { color: #d63447; }
-    input { padding: 8px; font-size: 16px; }
-    button { padding: 8px 12px; font-size: 16px; margin-left: 5px; }
-    #result { margin-top: 20px; font-weight: bold; font-size: 18px; }
+    /* Farben: 0 0 145 (Dunkelblau), 111 22 111 (Dunkelviolett/Magenta) */
+    :root {
+        --primary-color: rgb(0, 0, 145);
+        --secondary-color: rgb(111, 22, 111);
+        --background-light: #f4f4f4; /* Hellgrau für besseren Kontrast */
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: var(--background-light);
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        color: var(--primary-color);
+        margin-bottom: 20px;
+    }
+
+    p {
+        max-width: 400px;
+    }
+
+    #input-group {
+        display: flex;
+        width: 90%;
+        max-width: 350px;
+        margin-top: 20px;
+    }
+
+    input {
+        flex-grow: 1;
+        padding: 12px;
+        font-size: 16px;
+        border: 2px solid var(--primary-color);
+        border-radius: 5px 0 0 5px;
+    }
+
+    button {
+        padding: 12px 15px;
+        font-size: 16px;
+        background-color: var(--secondary-color);
+        color: white;
+        border: 2px solid var(--secondary-color);
+        border-left: none;
+        border-radius: 0 5px 5px 0;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    button:hover:not(:disabled) {
+        background-color: rgb(130, 40, 130);
+    }
+
+    button:disabled {
+        background-color: #ccc;
+        border-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    #result {
+        margin-top: 30px;
+        font-weight: bold;
+        font-size: 18px;
+        color: var(--primary-color);
+        min-height: 25px; /* Platzhalter für Nachricht */
+    }
+
+    #countdown {
+        color: var(--secondary-color);
+        margin-top: 10px;
+        font-size: 16px;
+    }
 </style>
 </head>
 <body>
@@ -16,24 +91,75 @@
 <h2>Helft Rudolph – Detektiv-Rätsel</h2>
 <p>Dieser Detektiv stürzt sich mutig in jedes Abenteuer, ist schnell zur Stelle, wenn Hilfe gebraucht wird, und hat immer einen kühlen Kopf, selbst in stürmischen Situationen. Wer ist es?</p>
 
-<input type="text" id="answer" placeholder="Name eingeben">
-<button onclick="checkAnswer()">Senden</button>
+<div id="input-group">
+    <input type="text" id="answer" placeholder="Name eingeben">
+    <button id="submitButton" onclick="checkAnswer()">Senden</button>
+</div>
 
 <p id="result"></p>
+<p id="countdown"></p>
 
 <script>
+// Zustand der Sperre
+let isLocked = false;
+const LOCK_DURATION = 60; // 60 Sekunden = 1 Minute
+const CORRECT_NAME = "jack blizzard";
+const resultElement = document.getElementById("result");
+const countdownElement = document.getElementById("countdown");
+const inputField = document.getElementById("answer");
+const submitButton = document.getElementById("submitButton");
+
 function checkAnswer() {
-    // Eingabe auslesen, Leerzeichen entfernen, Kleinbuchstaben für Vergleich
-    var ans = document.getElementById("answer").value.trim().toLowerCase();
-
-    // Richtiger Name
-    var correctName = "jack blizzard";
-
-    if(ans === correctName){
-        document.getElementById("result").innerHTML = "Richtig! Hier ist der nächste Hinweis: Code für Geschenk 482";
-    } else {
-        document.getElementById("result").innerHTML = "Falsch, überprüfe die Hinweise auf deinem Boarding Pass.";
+    if (isLocked) {
+        resultElement.innerHTML = "Bitte warten Sie, die Eingabe ist gesperrt.";
+        return;
     }
+
+    // Eingabe auslesen, Leerzeichen entfernen, Kleinbuchstaben für den flexiblen Vergleich
+    var ans = inputField.value.trim().toLowerCase();
+
+    if (ans === CORRECT_NAME) {
+        // ********** ERFOLG: NEUER HINWEIS EINGEFÜGT **********
+        resultElement.style.color = 'rgb(34, 139, 34)'; // Grün für Erfolg
+        resultElement.innerHTML = "Richtig! Was achtlos weggeworfen scheint, birgt manchmal mehr als nur Müll. Altes verbindet sich mit Neuem — such, wo Farben erzählen und Zahlen sprechen. Vielleicht hilft dir ein Relikt vergangener Gespräche, ihr Geheimnis zu entschlüsseln.";
+        countdownElement.innerHTML = "";
+        submitButton.disabled = true; // Button deaktivieren nach Erfolg
+    } else {
+        // ********** FEHLER **********
+        resultElement.style.color = 'rgb(145, 0, 0)'; // Rot für Fehler
+        
+        // Die korrigierte Fehlermeldung
+        resultElement.innerHTML = "Falsch, überprüfe noch einmal deine Eingabe. Achte auch auf die Rechtschreibung!";
+
+        // Sperre für eine Minute
+        lockInput();
+    }
+}
+
+function lockInput() {
+    isLocked = true;
+    submitButton.disabled = true;
+    inputField.disabled = true;
+    let timeRemaining = LOCK_DURATION;
+
+    // Startet und zeigt den Countdown an
+    countdownElement.innerHTML = `Nächster Versuch in ${timeRemaining} Sekunden.`;
+
+    const countdownInterval = setInterval(() => {
+        timeRemaining--;
+        countdownElement.innerHTML = `Nächster Versuch in ${timeRemaining} Sekunden.`;
+
+        if (timeRemaining <= 0) {
+            clearInterval(countdownInterval);
+            isLocked = false;
+            submitButton.disabled = false;
+            inputField.disabled = false;
+            countdownElement.innerHTML = "Eingabe ist wieder möglich.";
+            resultElement.innerHTML = ""; // Fehlermeldung nach Ablauf der Sperre entfernen
+            inputField.value = ""; // Eingabefeld leeren
+            inputField.focus(); // Fokus zurück auf das Eingabefeld
+        }
+    }, 1000); // Aktualisierung jede Sekunde
 }
 </script>
 
